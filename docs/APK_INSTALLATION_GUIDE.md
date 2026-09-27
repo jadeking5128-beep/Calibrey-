@@ -145,7 +145,9 @@ Because this APK is built directly from source code and not downloaded from the 
 
 | Symptom | Cause | Solution |
 | :--- | :--- | :--- |
-| **"App not installed" / Package corrupt** | Conflicting signature with previous build or insufficient storage | Uninstall any existing version of Calibrey first. Ensure at least 150 MB of free storage. |
-| **"Play Protect blocked installation"** | Development debug certificate used | Tap *"More details"* $\rightarrow$ *"Install anyway"*. This is normal for development APKs. |
-| **"Parse error"** | Android version is older than Android 7.0 (API 24) | Upgrade device to Android 7.0+ or test on a newer device/emulator. |
+| **"App not installed" / Package conflict** | Conflicting signature with a previously installed debug or template build | **Uninstall** any older version of "Calibrey" or "My Application" from your device, then re-open `Calibrey-v1.0.apk`. |
+| **"There was a problem parsing the package" (Parse Error)** | Incomplete file download or browser saved webpage instead of raw binary | Verify the file size is ~23MB. Ensure the file extension is `.apk` (not `.zip` or `.bin`). Download using the raw direct link. |
+| **"Play Protect blocked installation"** | Standard Android warning for apps compiled directly from source | Tap *"More details"* (or small dropdown arrow) $\rightarrow$ *"Install anyway"*. |
+| **"Install Unknown Apps" permission prompt** | Android requires explicit permission per app (Files, Chrome, Drive) | Tap **Settings** in the prompt $\rightarrow$ Enable **"Allow from this source"** $\rightarrow$ Return and tap **Install**. |
 | **AI Tutor returns network error** | Missing Gemini API key or device offline | Check your internet connectivity and ensure a valid Gemini API key is entered in Profile Settings. |
+
