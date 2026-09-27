@@ -1,0 +1,28 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Subtle outer orbital ring -->
+    <path
+        android:strokeColor="#66FFFFFF"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:pathData="M 54,26 A 28,28 0 1,1 53.9,26" />
+
+    <!-- Inner glowing circle -->
+    <path
+        android:fillColor="#33FFFFFF"
+        android:pathData="M 54,34 A 20,20 0 1,1 53.9,34" />
+
+    <!-- Calibrey C core glyph -->
+    <path
+        android:fillColor="#FAFAFA"
+        android:pathData="M64,43 C61.5,40.5 58,39 54,39 C45.7,39 39,45.7 39,54 C39,62.3 45.7,69 54,69 C58.2,69 61.8,67.3 64.3,64.6 L59.8,60.6 C58.3,62.2 56.2,63.2 54,63.2 C48.9,63.2 44.8,59.1 44.8,54 C44.8,48.9 48.9,44.8 54,44.8 C56.4,44.8 58.5,45.8 60,47.4 Z" />
+
+    <!-- Quantum orbital node -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 74,38 A 4,4 0 1,1 73.9,38" />
+</vector>
+

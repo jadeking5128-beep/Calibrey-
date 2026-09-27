@@ -1,0 +1,6 @@
+{
+  "name": "Calibrey",
+  "description": "Calibrey - Premium NCERT AI Educational OS & Learning Ecosystem",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
