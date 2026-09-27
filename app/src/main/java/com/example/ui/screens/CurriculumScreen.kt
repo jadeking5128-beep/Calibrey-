@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -26,6 +27,7 @@ import com.example.model.ChapterDifficulty
 import com.example.model.NcertClass
 import com.example.model.Subject
 import com.example.ui.components.GlassCard
+import com.example.ui.components.GlassStatusPill
 import com.example.ui.theme.*
 
 @Composable
@@ -58,7 +60,7 @@ fun CurriculumScreen(
   Column(
     modifier = modifier
       .fillMaxSize()
-      .background(ObsidianVoid)
+      .background(ObsidianPure)
       .padding(horizontal = 16.dp, vertical = 8.dp)
   ) {
     // Subject Pills Row
@@ -71,16 +73,21 @@ fun CurriculumScreen(
         Box(
           modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.08f))
-            .border(1.dp, if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.15f), RoundedCornerShape(20.dp))
+            .background(if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.05f))
+            .border(
+              1.dp,
+              if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.12f),
+              RoundedCornerShape(20.dp)
+            )
             .clickable { selectedSubject = subject }
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 7.dp)
         ) {
           Text(
-            text = subject.name,
-            color = if (isSelected) ObsidianVoid else PlatinumWhite,
-            fontSize = 13.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+            text = subject.name.uppercase(),
+            color = if (isSelected) ObsidianPure else SilverBright,
+            fontSize = 11.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            letterSpacing = 0.8.sp
           )
         }
       }
@@ -92,29 +99,30 @@ fun CurriculumScreen(
     OutlinedTextField(
       value = searchQuery,
       onValueChange = { searchQuery = it },
-      placeholder = { Text("Search NCERT chapters, topics, formulas...") },
-      leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = SilverMedium) },
+      placeholder = { Text("Search NCERT syllabus, derivations, formulas...", color = SilverMuted, fontSize = 13.sp) },
+      leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = SilverMedium, modifier = Modifier.size(18.dp)) },
       trailingIcon = {
         if (searchQuery.isNotEmpty()) {
           IconButton(onClick = { searchQuery = "" }) {
-            Icon(Icons.Default.Close, contentDescription = "Clear", tint = SilverMedium)
+            Icon(Icons.Default.Close, contentDescription = "Clear", tint = SilverMedium, modifier = Modifier.size(16.dp))
           }
         }
       },
+      shape = RoundedCornerShape(14.dp),
       colors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = ObsidianElevated.copy(alpha = 0.6f),
+        unfocusedContainerColor = ObsidianDark.copy(alpha = 0.5f),
         focusedTextColor = PlatinumWhite,
         unfocusedTextColor = PlatinumWhite,
-        focusedBorderColor = PlatinumWhite,
-        unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-        focusedPlaceholderColor = SilverMuted,
-        unfocusedPlaceholderColor = SilverMuted,
+        focusedBorderColor = Color.White.copy(alpha = 0.35f),
+        unfocusedBorderColor = Color.White.copy(alpha = 0.10f),
         cursorColor = PlatinumWhite
       ),
       modifier = Modifier.fillMaxWidth(),
       singleLine = true
     )
 
-    Spacer(modifier = Modifier.height(12.dp))
+    Spacer(modifier = Modifier.height(14.dp))
 
     // Chapters List
     LazyColumn(
@@ -142,33 +150,23 @@ fun CurriculumScreen(
                 Text(
                   text = "CHAPTER ${chapter.chapterNumber}",
                   color = SilverMedium,
-                  fontSize = 11.sp,
+                  fontSize = 10.sp,
                   fontWeight = FontWeight.Bold,
                   letterSpacing = 1.sp
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 
-                val diffColor = when (chapter.difficulty) {
-                  ChapterDifficulty.FOUNDATIONAL -> MasteryEmerald
-                  ChapterDifficulty.CORE -> PlatinumWhite
-                  ChapterDifficulty.ADVANCED -> GravityAmber
-                }
-                Box(
-                  modifier = Modifier
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(diffColor.copy(alpha = 0.15f))
-                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                  Text(
-                    text = chapter.difficulty.name,
-                    color = diffColor,
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold
-                  )
-                }
+                GlassStatusPill(
+                  label = chapter.difficulty.name,
+                  accentColor = when (chapter.difficulty) {
+                    ChapterDifficulty.FOUNDATIONAL -> MasteryEmerald
+                    ChapterDifficulty.CORE -> PlatinumWhite
+                    ChapterDifficulty.ADVANCED -> GravityAmber
+                  }
+                )
               }
 
-              Spacer(modifier = Modifier.height(4.dp))
+              Spacer(modifier = Modifier.height(6.dp))
 
               Text(
                 text = chapter.title,
@@ -177,30 +175,32 @@ fun CurriculumScreen(
                 fontWeight = FontWeight.Bold
               )
 
-              Spacer(modifier = Modifier.height(2.dp))
+              Spacer(modifier = Modifier.height(3.dp))
 
               Text(
                 text = chapter.subtitle,
                 color = SilverMedium,
                 fontSize = 12.sp,
-                maxLines = 2
+                maxLines = 2,
+                lineHeight = 16.sp
               )
             }
 
             // Bookmark Button
             IconButton(
               onClick = { onToggleBookmark(chapter.id, isBookmarked) },
-              modifier = Modifier.size(36.dp)
+              modifier = Modifier.size(34.dp)
             ) {
               Icon(
                 imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                 contentDescription = "Bookmark",
-                tint = if (isBookmarked) GravityAmber else SilverMedium
+                tint = if (isBookmarked) GravityAmber else SilverMedium,
+                modifier = Modifier.size(18.dp)
               )
             }
           }
 
-          Spacer(modifier = Modifier.height(10.dp))
+          Spacer(modifier = Modifier.height(12.dp))
 
           // Footer Info & Progress
           Row(
@@ -209,23 +209,32 @@ fun CurriculumScreen(
             verticalAlignment = Alignment.CenterVertically
           ) {
             Text(
-              text = "⏱️ ${chapter.estimatedMinutes} mins • 📑 ${chapter.subtopics.size} subtopics",
+              text = "${chapter.estimatedMinutes} MINS • ${chapter.subtopics.size} SUBTOPICS",
               color = SilverMuted,
-              fontSize = 11.sp
+              fontSize = 10.sp,
+              fontWeight = FontWeight.Bold,
+              letterSpacing = 0.5.sp
             )
 
             if (isCompleted) {
               Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MasteryEmerald, modifier = Modifier.size(14.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Completed", color = MasteryEmerald, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                Box(modifier = Modifier.size(5.dp).clip(CircleShape).background(MasteryEmerald))
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                  text = "COMPLETED",
+                  color = MasteryEmerald,
+                  fontSize = 10.sp,
+                  fontWeight = FontWeight.Bold,
+                  letterSpacing = 0.5.sp
+                )
               }
             } else if (percent > 0f) {
               Text(
-                text = "${(percent * 100).toInt()}% Done",
+                text = "${(percent * 100).toInt()}% MASTERED",
                 color = PlatinumWhite,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp
               )
             }
           }

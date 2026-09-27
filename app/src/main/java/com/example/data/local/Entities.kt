@@ -14,7 +14,8 @@ data class UserProfileEntity(
   val gravityPoints: Int,
   val currentStreak: Int,
   val bestStreak: Int,
-  val totalMinutesStudied: Int
+  val totalMinutesStudied: Int,
+  val isAuthenticated: Boolean = true
 )
 
 @Entity(tableName = "chapter_progress")

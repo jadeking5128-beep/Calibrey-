@@ -32,43 +32,43 @@ fun StudyHeatmapView(
     ) {
       Column {
         Text(
-          text = "STUDY CONSISTENCY HEATMAP",
+          text = "STUDY CONSISTENCY MATRIX",
           color = SilverMedium,
-          fontSize = 11.sp,
+          fontSize = 10.sp,
           fontWeight = FontWeight.Bold,
           letterSpacing = 1.sp
         )
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
-          text = "8-Week Active Learning Matrix",
+          text = "8-Week Active Learning Rhythm",
           color = PlatinumWhite,
           fontSize = 14.sp,
-          fontWeight = FontWeight.SemiBold
+          fontWeight = FontWeight.Bold
         )
       }
 
-      // Legend
+      // Minimalist Monochrome Intensity Legend
       Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Less", color = SilverMuted, fontSize = 10.sp)
-        Spacer(modifier = Modifier.width(4.dp))
+        Text("LESS", color = SilverMuted, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.width(5.dp))
         for (i in 0..4) {
           Box(
             modifier = Modifier
-              .size(10.dp)
+              .size(9.dp)
               .clip(RoundedCornerShape(2.dp))
               .background(getHeatmapColor(i))
-              .border(0.5.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(2.dp))
+              .border(0.5.dp, Color.White.copy(alpha = 0.10f), RoundedCornerShape(2.dp))
           )
-          Spacer(modifier = Modifier.width(2.dp))
+          Spacer(modifier = Modifier.width(2.5.dp))
         }
-        Spacer(modifier = Modifier.width(2.dp))
-        Text("More", color = SilverMuted, fontSize = 10.sp)
+        Spacer(modifier = Modifier.width(2.5.dp))
+        Text("MORE", color = SilverMuted, fontSize = 9.sp, fontWeight = FontWeight.Bold)
       }
     }
 
     Spacer(modifier = Modifier.height(14.dp))
 
-    // Matrix Grid (7 rows for days of week, 8 columns for weeks)
-    // Group into chunks of 7 days
+    // Matrix Grid (7 rows for days of week, columns for weeks)
     val weeks = activityLogs.chunked(7)
     Row(
       modifier = Modifier.fillMaxWidth(),
@@ -80,12 +80,12 @@ fun StudyHeatmapView(
             val isSelected = selectedDay?.date == day.date
             Box(
               modifier = Modifier
-                .size(14.dp)
+                .size(13.dp)
                 .clip(RoundedCornerShape(3.dp))
                 .background(getHeatmapColor(day.intensity))
                 .border(
                   width = if (isSelected) 1.5.dp else 0.5.dp,
-                  color = if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.2f),
+                  color = if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.12f),
                   shape = RoundedCornerShape(3.dp)
                 )
                 .clickable { selectedDay = day }
@@ -103,23 +103,23 @@ fun StudyHeatmapView(
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .clip(RoundedCornerShape(8.dp))
-          .background(Color.White.copy(alpha = 0.05f))
-          .border(0.5.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
-          .padding(horizontal = 10.dp, vertical = 6.dp),
+          .clip(RoundedCornerShape(10.dp))
+          .background(Color.White.copy(alpha = 0.04f))
+          .border(0.5.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(10.dp))
+          .padding(horizontal = 12.dp, vertical = 7.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text(
-          text = "${dayToShow.date} (Activity level ${dayToShow.intensity}/4)",
+          text = dayToShow.date,
           color = SilverBright,
-          fontSize = 12.sp
-        )
-        Text(
-          text = "${dayToShow.minutesStudied}m studied • ${dayToShow.quizzesCompleted} quizzes",
-          color = SilverMedium,
           fontSize = 11.sp,
           fontWeight = FontWeight.Medium
+        )
+        Text(
+          text = "${dayToShow.minutesStudied}m logged • ${dayToShow.quizzesCompleted} assessment(s)",
+          color = SilverMedium,
+          fontSize = 11.sp
         )
       }
     }
@@ -128,11 +128,11 @@ fun StudyHeatmapView(
 
 private fun getHeatmapColor(intensity: Int): Color {
   return when (intensity) {
-    0 -> Color(0xFF1E1E24)
-    1 -> Color(0xFF3F3F46)
-    2 -> Color(0xFF71717A)
-    3 -> Color(0xFFA1A1AA)
+    0 -> Color(0xFF111116)
+    1 -> Color(0xFF22222D)
+    2 -> Color(0xFF444458)
+    3 -> Color(0xFF7A7A94)
     4 -> PlatinumWhite
-    else -> Color(0xFF1E1E24)
+    else -> Color(0xFF111116)
   }
 }

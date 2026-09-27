@@ -73,6 +73,15 @@ fun CalibreyApp(viewModel: CalibreyViewModel) {
     return
   }
 
+  if (!userProfile.isAuthenticated || userProfile.fullName.isBlank()) {
+    OnboardingScreen(
+      onComplete = { name, role, ncertClass, avatarId, apiKey ->
+        viewModel.authenticateUser(name, role, ncertClass, avatarId, apiKey)
+      }
+    )
+    return
+  }
+
   Scaffold(
     modifier = Modifier
       .fillMaxSize()
@@ -258,7 +267,8 @@ fun CalibreyApp(viewModel: CalibreyViewModel) {
         onDismiss = { viewModel.closeProfileDialog() },
         onSaveProfile = { name, role, ncertClass, avatarId, apiKey ->
           viewModel.updateProfile(name, role, ncertClass, avatarId, apiKey)
-        }
+        },
+        onSignOut = { viewModel.signOut() }
       )
     }
   }

@@ -8,7 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -49,7 +49,7 @@ fun ExamWarRoomScreen(
           .clip(CircleShape)
           .background(Color.White.copy(alpha = 0.08f))
       ) {
-        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = PlatinumWhite)
+        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = PlatinumWhite)
       }
       Spacer(modifier = Modifier.width(12.dp))
       Column {

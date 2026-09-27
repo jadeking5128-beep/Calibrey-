@@ -23,25 +23,8 @@ class CalibreyRepository(
   // Profile Flow
   val userProfile: StateFlow<UserProfile> = dao.getUserProfile()
     .map { entity ->
-      if (entity == null) {
-        val defaultProfile = UserProfile()
-        scope.launch(Dispatchers.IO) {
-          dao.saveUserProfile(
-            UserProfileEntity(
-              id = "primary_user",
-              fullName = defaultProfile.fullName,
-              role = defaultProfile.role.name,
-              ncertClass = defaultProfile.ncertClass.name,
-              avatarId = defaultProfile.avatarId,
-              geminiApiKey = defaultProfile.geminiApiKey,
-              gravityPoints = defaultProfile.gravityPoints,
-              currentStreak = defaultProfile.currentStreak,
-              bestStreak = defaultProfile.bestStreak,
-              totalMinutesStudied = defaultProfile.totalMinutesStudied
-            )
-          )
-        }
-        defaultProfile
+      if (entity == null || entity.fullName.isBlank() || !entity.isAuthenticated) {
+        UserProfile(isAuthenticated = false)
       } else {
         val ncertClass = runCatching { NcertClass.valueOf(entity.ncertClass) }.getOrDefault(NcertClass.CLASS_10)
         val role = runCatching { UserRole.valueOf(entity.role) }.getOrDefault(UserRole.STUDENT)
@@ -57,11 +40,12 @@ class CalibreyRepository(
           bestStreak = entity.bestStreak,
           level = UserProfile.calculateLevel(entity.gravityPoints),
           rankTitle = UserProfile.calculateRank(entity.gravityPoints),
-          totalMinutesStudied = entity.totalMinutesStudied
+          totalMinutesStudied = entity.totalMinutesStudied,
+          isAuthenticated = true
         )
       }
     }
-    .stateIn(scope, SharingStarted.Eagerly, UserProfile())
+    .stateIn(scope, SharingStarted.Eagerly, UserProfile(isAuthenticated = false))
 
   // Progress Flows
   val chapterProgressMap: StateFlow<Map<String, ChapterProgressEntity>> = dao.getAllChapterProgress()
@@ -148,14 +132,36 @@ class CalibreyRepository(
 
   private val _chatMessages = MutableStateFlow(
     listOf(
-      StudyChatMessage("c1", "Ananya Iyer", false, "Hey Aarav! Have you practiced the ray diagram for concave mirror when object is at C?", null, "10:14 AM"),
-      StudyChatMessage("c2", "Aarav Sharma", true, "Yes! The image is also formed at C, real, inverted, and same size as object.", "1/f = 1/v + 1/u", "10:16 AM"),
-      StudyChatMessage("c3", "Ananya Iyer", false, "Exactly! And magnification m = -1. Calibrey AI also explained it with a nice simulation.", null, "10:18 AM")
+      StudyChatMessage("c1", "Ananya Iyer", false, "Have you reviewed the ray diagram for concave mirror when object is at center of curvature (C)?", null, "10:14 AM"),
+      StudyChatMessage("c2", "Class Peer", true, "Yes! The image is also formed at C: real, inverted, and equal in size to the object.", "1/f = 1/v + 1/u", "10:16 AM"),
+      StudyChatMessage("c3", "Ananya Iyer", false, "Exactly, with linear magnification m = -1. Calibrey AI breaks down the proof step-by-step.", null, "10:18 AM")
     )
   )
   val chatMessages: StateFlow<List<StudyChatMessage>> = _chatMessages.asStateFlow()
 
   // User Actions
+  suspend fun authenticateUser(name: String, role: UserRole, ncertClass: NcertClass, avatarId: Int, apiKey: String) {
+    dao.saveUserProfile(
+      UserProfileEntity(
+        id = "primary_user",
+        fullName = name,
+        role = role.name,
+        ncertClass = ncertClass.name,
+        avatarId = avatarId,
+        geminiApiKey = apiKey,
+        gravityPoints = 100, // Welcome grant for setting up academic profile
+        currentStreak = 1,
+        bestStreak = 1,
+        totalMinutesStudied = 0,
+        isAuthenticated = true
+      )
+    )
+  }
+
+  suspend fun signOut() {
+    dao.clearUserProfile()
+  }
+
   suspend fun updateUserProfile(name: String, role: UserRole, ncertClass: NcertClass, avatarId: Int, apiKey: String) {
     val current = userProfile.value
     dao.saveUserProfile(
@@ -169,7 +175,8 @@ class CalibreyRepository(
         gravityPoints = current.gravityPoints,
         currentStreak = current.currentStreak,
         bestStreak = current.bestStreak,
-        totalMinutesStudied = current.totalMinutesStudied
+        totalMinutesStudied = current.totalMinutesStudied,
+        isAuthenticated = true
       )
     )
   }

@@ -15,6 +15,9 @@ interface CalibreyDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun saveUserProfile(user: UserProfileEntity)
 
+  @Query("DELETE FROM user_profile WHERE id = 'primary_user'")
+  suspend fun clearUserProfile()
+
   @Query("UPDATE user_profile SET gravityPoints = gravityPoints + :deltaGp WHERE id = 'primary_user'")
   suspend fun addGravityPoints(deltaGp: Int)
 

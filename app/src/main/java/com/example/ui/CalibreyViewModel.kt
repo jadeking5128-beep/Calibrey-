@@ -98,6 +98,21 @@ class CalibreyViewModel(
     isProfileDialogOpen.value = false
   }
 
+  fun authenticateUser(name: String, role: UserRole, ncertClass: NcertClass, avatarId: Int, apiKey: String) {
+    viewModelScope.launch {
+      repository.authenticateUser(name, role, ncertClass, avatarId, apiKey)
+    }
+  }
+
+  fun signOut() {
+    viewModelScope.launch {
+      repository.signOut()
+      isProfileDialogOpen.value = false
+      activeDestination.value = ScreenDestination.MainTabs
+      currentTab.value = NavigationTab.DASHBOARD
+    }
+  }
+
   fun updateProfile(name: String, role: UserRole, ncertClass: NcertClass, avatarId: Int, apiKey: String) {
     viewModelScope.launch {
       repository.updateUserProfile(name, role, ncertClass, avatarId, apiKey)

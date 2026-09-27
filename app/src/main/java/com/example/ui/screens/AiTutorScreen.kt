@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -151,7 +152,7 @@ fun AiTutorScreen(
                     .background(Color.White.copy(alpha = 0.15f)),
                   contentAlignment = Alignment.Center
                 ) {
-                  Text("🧠", fontSize = 12.sp)
+                  Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PlatinumWhite, modifier = Modifier.size(13.dp))
                 }
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
@@ -230,7 +231,7 @@ fun AiTutorScreen(
         enabled = inputQuery.isNotBlank() && !isLoading
       ) {
         Icon(
-          imageVector = Icons.Default.Send,
+          imageVector = Icons.AutoMirrored.Filled.Send,
           contentDescription = "Send",
           tint = if (inputQuery.isNotBlank()) PlatinumWhite else SilverMuted
         )

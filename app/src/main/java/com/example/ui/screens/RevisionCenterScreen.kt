@@ -25,6 +25,7 @@ import com.example.model.RevisionItem
 import com.example.model.RevisionUrgency
 import com.example.ui.components.GlassButton
 import com.example.ui.components.GlassCard
+import com.example.ui.components.GlassStatusPill
 import com.example.ui.theme.*
 
 @Composable
@@ -53,7 +54,7 @@ fun RevisionCenterScreen(
   Column(
     modifier = modifier
       .fillMaxSize()
-      .background(ObsidianVoid)
+      .background(ObsidianPure)
       .verticalScroll(rememberScrollState())
       .padding(horizontal = 16.dp, vertical = 8.dp)
   ) {
@@ -66,30 +67,30 @@ fun RevisionCenterScreen(
         modifier = Modifier.weight(1f),
         onClick = onNavigateToKnowledgeGraph
       ) {
-        Text("🗺️", fontSize = 16.sp)
-        Spacer(modifier = Modifier.height(4.dp))
+        Icon(Icons.Default.Hub, contentDescription = null, tint = PlatinumWhite, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text("Knowledge Graph", color = PlatinumWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        Text("Visual curriculum map", color = SilverMuted, fontSize = 10.sp)
+        Text("Curriculum map", color = SilverMuted, fontSize = 10.sp)
       }
 
       GlassCard(
         modifier = Modifier.weight(1f),
         onClick = onNavigateToWarRoom
       ) {
-        Text("⚔️", fontSize = 16.sp)
-        Spacer(modifier = Modifier.height(4.dp))
+        Icon(Icons.Default.HourglassBottom, contentDescription = null, tint = PlatinumWhite, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text("Exam War Room", color = PlatinumWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        Text("Countdown & syllabus", color = SilverMuted, fontSize = 10.sp)
+        Text("Countdown radar", color = SilverMuted, fontSize = 10.sp)
       }
 
       GlassCard(
         modifier = Modifier.weight(1f),
         onClick = onNavigateToSavedNotes
       ) {
-        Text("📑", fontSize = 16.sp)
-        Spacer(modifier = Modifier.height(4.dp))
+        Icon(Icons.Default.BookmarkBorder, contentDescription = null, tint = PlatinumWhite, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text("Saved Notes", color = PlatinumWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        Text("AI summaries library", color = SilverMuted, fontSize = 10.sp)
+        Text("AI summaries", color = SilverMuted, fontSize = 10.sp)
       }
     }
 
@@ -109,12 +110,12 @@ fun RevisionCenterScreen(
         verticalAlignment = Alignment.CenterVertically
       ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Text("⚡", fontSize = 16.sp)
+          Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PlatinumWhite, modifier = Modifier.size(15.dp))
           Spacer(modifier = Modifier.width(6.dp))
           Text(
             text = "ACTIVE RECALL FLASHCARD OF THE DAY",
             color = SilverMedium,
-            fontSize = 11.sp,
+            fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.sp
           )
@@ -164,7 +165,7 @@ fun RevisionCenterScreen(
     Text(
       text = "ADAPTIVE SPACED REPETITION QUEUE",
       color = SilverMedium,
-      fontSize = 11.sp,
+      fontSize = 10.sp,
       fontWeight = FontWeight.Bold,
       letterSpacing = 1.sp
     )
@@ -189,24 +190,15 @@ fun RevisionCenterScreen(
         ) {
           Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-              Box(
-                modifier = Modifier
-                  .clip(RoundedCornerShape(4.dp))
-                  .background(badgeColor.copy(alpha = 0.15f))
-                  .padding(horizontal = 6.dp, vertical = 2.dp)
-              ) {
-                Text(
-                  text = badgeText,
-                  color = badgeColor,
-                  fontSize = 9.sp,
-                  fontWeight = FontWeight.Bold
-                )
-              }
-              Spacer(modifier = Modifier.width(6.dp))
-              Text(text = item.subjectName, color = SilverMedium, fontSize = 11.sp)
+              GlassStatusPill(
+                label = badgeText,
+                accentColor = badgeColor
+              )
+              Spacer(modifier = Modifier.width(8.dp))
+              Text(text = item.subjectName.uppercase(), color = SilverMedium, fontSize = 10.sp, letterSpacing = 0.5.sp)
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
               text = item.chapterTitle,
@@ -215,26 +207,26 @@ fun RevisionCenterScreen(
               fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(3.dp))
 
             Text(
-              text = "Last Quiz: ${item.lastQuizScore}% • Weak Topics: ${item.weakConcepts.joinToString(", ")}",
+              text = "Last Quiz: ${item.lastQuizScore}% • Focus: ${item.weakConcepts.joinToString(", ")}",
               color = SilverMuted,
               fontSize = 11.sp
             )
           }
 
-          Spacer(modifier = Modifier.width(8.dp))
+          Spacer(modifier = Modifier.width(10.dp))
 
           Box(
             modifier = Modifier
               .clip(RoundedCornerShape(20.dp))
               .background(PlatinumWhite)
-              .padding(horizontal = 12.dp, vertical = 6.dp)
+              .padding(horizontal = 14.dp, vertical = 7.dp)
           ) {
             Text(
               text = "Revise",
-              color = ObsidianVoid,
+              color = ObsidianPure,
               fontSize = 12.sp,
               fontWeight = FontWeight.Bold
             )

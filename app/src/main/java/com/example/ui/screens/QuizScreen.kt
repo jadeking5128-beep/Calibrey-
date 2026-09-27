@@ -61,7 +61,12 @@ fun QuizScreen(
           .border(2.dp, PlatinumWhite, CircleShape),
         contentAlignment = Alignment.Center
       ) {
-        Text("🏆", fontSize = 36.sp)
+        Icon(
+          imageVector = Icons.Default.Verified,
+          contentDescription = null,
+          tint = PlatinumWhite,
+          modifier = Modifier.size(38.dp)
+        )
       }
 
       Spacer(modifier = Modifier.height(20.dp))

@@ -1,5 +1,7 @@
 package com.example.ui.components
 
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,8 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,26 +35,50 @@ fun KnowledgeGraphView(
 ) {
   var selectedNode by remember { mutableStateOf(nodes.firstOrNull()) }
 
+  val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+  val pulseAnim by infiniteTransition.animateFloat(
+    initialValue = 1f,
+    targetValue = 1.15f,
+    animationSpec = infiniteRepeatable(
+      animation = tween(1400, easing = FastOutSlowInEasing),
+      repeatMode = RepeatMode.Reverse
+    ),
+    label = "pulse"
+  )
+
   Column(modifier = modifier.fillMaxWidth()) {
     // Interactive Graph Canvas Area
     GlassCard(
       modifier = Modifier
         .fillMaxWidth()
-        .height(280.dp),
+        .height(290.dp),
       backgroundAlpha = 0.05f
     ) {
       Box(modifier = Modifier.fillMaxSize()) {
-        // Background Grid and Lines
+        // Background Grid and Synaptic Connections
         Canvas(modifier = Modifier.fillMaxSize()) {
           val canvasWidth = size.width
           val canvasHeight = size.height
 
-          // Draw connections between nodes
+          // Subtle ambient grid dots
+          val dotStepX = canvasWidth / 10
+          val dotStepY = canvasHeight / 6
+          for (x in 1..9) {
+            for (y in 1..5) {
+              drawCircle(
+                color = Color.White.copy(alpha = 0.04f),
+                radius = 1.dp.toPx(),
+                center = Offset(x * dotStepX, y * dotStepY)
+              )
+            }
+          }
+
+          // Draw synaptic lines between interconnected nodes
           nodes.forEachIndexed { index, node ->
             val col = index % 3
             val row = index / 3
             val startX = (canvasWidth / 4) * (col + 1)
-            val startY = (canvasHeight / 5) * (row + 1)
+            val startY = (canvasHeight / 4.2f) * (row + 1)
 
             node.connectedNodeIds.forEach { targetId ->
               val targetIndex = nodes.indexOfFirst { it.id == targetId }
@@ -57,13 +86,23 @@ fun KnowledgeGraphView(
                 val targetCol = targetIndex % 3
                 val targetRow = targetIndex / 3
                 val endX = (canvasWidth / 4) * (targetCol + 1)
-                val endY = (canvasHeight / 5) * (targetRow + 1)
+                val endY = (canvasHeight / 4.2f) * (targetRow + 1)
+
+                val isConnectionActive = selectedNode?.id == node.id || selectedNode?.id == targetId
 
                 drawLine(
-                  color = Color.White.copy(alpha = 0.2f),
+                  brush = Brush.linearGradient(
+                    colors = if (isConnectionActive) {
+                      listOf(PlatinumWhite.copy(alpha = 0.45f), PlatinumWhite.copy(alpha = 0.15f))
+                    } else {
+                      listOf(Color.White.copy(alpha = 0.12f), Color.White.copy(alpha = 0.04f))
+                    },
+                    start = Offset(startX, startY),
+                    end = Offset(endX, endY)
+                  ),
                   start = Offset(startX, startY),
                   end = Offset(endX, endY),
-                  strokeWidth = 2.dp.toPx(),
+                  strokeWidth = if (isConnectionActive) 2.dp.toPx() else 1.2.dp.toPx(),
                   cap = StrokeCap.Round
                 )
               }
@@ -79,8 +118,8 @@ fun KnowledgeGraphView(
           nodes.take(9).forEachIndexed { index, node ->
             val col = index % 3
             val row = index / 3
-            val xOffset = (maxWidthPx / 4) * (col + 1) - 24.dp
-            val yOffset = (maxHeightPx / 4.5f) * (row + 1) - 24.dp
+            val xOffset = (maxWidthPx / 4) * (col + 1) - 22.dp
+            val yOffset = (maxHeightPx / 4.2f) * (row + 1) - 22.dp
 
             val isSelected = selectedNode?.id == node.id
             val statusColor = when (node.status) {
@@ -94,12 +133,20 @@ fun KnowledgeGraphView(
             Box(
               modifier = Modifier
                 .offset(x = xOffset, y = yOffset)
-                .size(48.dp)
+                .size(44.dp)
                 .clip(CircleShape)
-                .background(ObsidianDark)
+                .background(ObsidianPure)
                 .border(
-                  width = if (isSelected) 2.5.dp else 1.5.dp,
-                  color = if (isSelected) PlatinumWhite else statusColor.copy(alpha = 0.8f),
+                  BorderStroke(
+                    width = if (isSelected) 2.dp else 1.dp,
+                    brush = if (isSelected) {
+                      Brush.verticalGradient(listOf(PlatinumWhite, SilverBright))
+                    } else {
+                      Brush.verticalGradient(
+                        listOf(statusColor.copy(alpha = 0.6f), statusColor.copy(alpha = 0.2f))
+                      )
+                    }
+                  ),
                   shape = CircleShape
                 )
                 .clickable {
@@ -108,6 +155,16 @@ fun KnowledgeGraphView(
                 },
               contentAlignment = Alignment.Center
             ) {
+              if (isSelected) {
+                Box(
+                  modifier = Modifier
+                    .fillMaxSize()
+                    .scale(pulseAnim)
+                    .clip(CircleShape)
+                    .background(statusColor.copy(alpha = 0.15f))
+                )
+              }
+
               Text(
                 text = "${node.masteryPercent}%",
                 color = PlatinumWhite,
@@ -141,7 +198,7 @@ fun KnowledgeGraphView(
               fontSize = 15.sp,
               fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
               text = "Formula: ${active.keyFormula.ifBlank { "Standard NCERT Principle" }}",
               color = SilverMedium,
@@ -157,20 +214,10 @@ fun KnowledgeGraphView(
             NodeStatus.LOCKED -> "LOCKED" to SilverMuted
           }
 
-          Box(
-            modifier = Modifier
-              .clip(RoundedCornerShape(8.dp))
-              .background(statusBadge.second.copy(alpha = 0.15f))
-              .border(0.5.dp, statusBadge.second.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
-              .padding(horizontal = 8.dp, vertical = 4.dp)
-          ) {
-            Text(
-              text = statusBadge.first,
-              color = statusBadge.second,
-              fontSize = 10.sp,
-              fontWeight = FontWeight.Bold
-            )
-          }
+          GlassStatusPill(
+            label = statusBadge.first,
+            accentColor = statusBadge.second
+          )
         }
       }
     }

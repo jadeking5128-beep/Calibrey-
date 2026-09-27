@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,11 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.model.Achievement
 import com.example.model.NcertClass
 import com.example.model.UserProfile
 import com.example.model.UserRole
@@ -28,32 +29,49 @@ import com.example.ui.components.GlassButton
 import com.example.ui.components.GlassCard
 import com.example.ui.theme.*
 
+data class CleanAchievement(
+  val id: String,
+  val title: String,
+  val description: String,
+  val icon: ImageVector,
+  val isUnlocked: Boolean,
+  val rewardGp: Int
+)
+
 @Composable
 fun ProfileDialog(
   userProfile: UserProfile,
   onDismiss: () -> Unit,
-  onSaveProfile: (name: String, role: UserRole, ncertClass: NcertClass, avatarId: Int, apiKey: String) -> Unit
+  onSaveProfile: (name: String, role: UserRole, ncertClass: NcertClass, avatarId: Int, apiKey: String) -> Unit,
+  onSignOut: () -> Unit
 ) {
   var name by remember { mutableStateOf(userProfile.fullName) }
   var selectedClass by remember { mutableStateOf(userProfile.ncertClass) }
   var selectedAvatarId by remember { mutableStateOf(userProfile.avatarId) }
   var apiKey by remember { mutableStateOf(userProfile.geminiApiKey) }
-  var activeTab by remember { mutableStateOf("Profile") } // "Profile" or "Achievements"
+  var activeTab by remember { mutableStateOf("Profile") }
 
-  val avatars = listOf("👨‍🎓", "👩‍🎓", "🧑‍🔬", "👩‍💻", "🧑‍🏫", "🚀")
+  val insignias = listOf(
+    1 to "SC",
+    2 to "MT",
+    3 to "PH",
+    4 to "CH",
+    5 to "BI",
+    6 to "CB"
+  )
 
   val achievements = listOf(
-    Achievement("a1", "Quantum Leap", "Earned your first 1,000 Gravity Points", "⚡", true, "Sept 2026", 100),
-    Achievement("a2", "Solar Streak", "Maintained a 7-day study streak", "🔥", true, "Sept 2026", 150),
-    Achievement("a3", "Optics Virtuoso", "Perfect 100% score on Light Reflection quiz", "🔬", true, "Sept 2026", 200),
-    Achievement("a4", "Formula Alchemist", "Generated 5 AI master revision sheets", "🧪", true, "Sept 2026", 120),
-    Achievement("a5", "Night Owl Scholar", "Completed a study session past 10 PM", "🦉", false, "", 80),
-    Achievement("a6", "Singularity Master", "Attain 10,000+ Gravity Points", "🌌", false, "", 500)
+    CleanAchievement("a1", "Quantum Leap", "Earned your first 1,000 Gravity Points", Icons.Default.Bolt, userProfile.gravityPoints >= 1000, 100),
+    CleanAchievement("a2", "Solar Streak", "Maintained a 7-day study streak", Icons.Default.Timer, userProfile.currentStreak >= 7, 150),
+    CleanAchievement("a3", "Optics Virtuoso", "Completed Light Reflection active drill", Icons.Default.Visibility, true, 200),
+    CleanAchievement("a4", "Formula Alchemist", "Generated AI master revision notes", Icons.Default.AutoAwesome, true, 120),
+    CleanAchievement("a5", "Night Owl Scholar", "Completed a focused study session", Icons.Default.Bedtime, false, 80),
+    CleanAchievement("a6", "Singularity Master", "Attain 10,000+ Gravity Points", Icons.Default.Verified, false, 500)
   )
 
   Dialog(onDismissRequest = onDismiss) {
     Surface(
-      shape = RoundedCornerShape(20.dp),
+      shape = RoundedCornerShape(22.dp),
       color = ObsidianDark,
       border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
       modifier = Modifier
@@ -72,19 +90,27 @@ fun ProfileDialog(
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically
         ) {
-          Text(
-            text = "PROFILE & IDENTITY",
-            color = SilverMedium,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp
-          )
+          Column {
+            Text(
+              text = "ACADEMIC IDENTITY",
+              color = SilverMedium,
+              fontSize = 10.sp,
+              fontWeight = FontWeight.Bold,
+              letterSpacing = 1.sp
+            )
+            Text(
+              text = userProfile.fullName.ifBlank { "Student Account" },
+              color = PlatinumWhite,
+              fontSize = 17.sp,
+              fontWeight = FontWeight.Bold
+            )
+          }
           IconButton(onClick = onDismiss, modifier = Modifier.size(28.dp)) {
             Icon(Icons.Default.Close, contentDescription = "Close", tint = PlatinumWhite)
           }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         // Switcher Tabs
         Row(
@@ -118,29 +144,34 @@ fun ProfileDialog(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (activeTab == "Profile") {
-          // Avatar Row
-          Text(text = "AVATAR", color = SilverMedium, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+          // Insignia Row
+          Text(text = "ACADEMIC INSIGNIA", color = SilverMedium, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp)
           Spacer(modifier = Modifier.height(6.dp))
           Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
           ) {
-            avatars.forEachIndexed { index, av ->
-              val isSelected = selectedAvatarId == index + 1
+            insignias.forEach { (id, code) ->
+              val isSelected = selectedAvatarId == id
               Box(
                 modifier = Modifier
-                  .size(40.dp)
+                  .size(42.dp)
                   .clip(CircleShape)
-                  .background(if (isSelected) Color.White.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f))
-                  .border(
-                    width = if (isSelected) 2.dp else 1.dp,
-                    color = if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.15f),
-                    shape = CircleShape
-                  )
-                  .clickable { selectedAvatarId = index + 1 },
+                  .background(if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.06f))
+                .border(
+                  width = if (isSelected) 2.dp else 1.dp,
+                  color = if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.15f),
+                  shape = CircleShape
+                )
+                .clickable { selectedAvatarId = id },
                 contentAlignment = Alignment.Center
               ) {
-                Text(text = av, fontSize = 20.sp)
+                Text(
+                  text = code,
+                  fontSize = 13.sp,
+                  fontWeight = FontWeight.Bold,
+                  color = if (isSelected) ObsidianPure else PlatinumWhite
+                )
               }
             }
           }
@@ -151,7 +182,7 @@ fun ProfileDialog(
           OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Student Name") },
+            label = { Text("Student Full Name") },
             colors = OutlinedTextFieldDefaults.colors(
               focusedTextColor = PlatinumWhite,
               unfocusedTextColor = PlatinumWhite,
@@ -170,7 +201,8 @@ fun ProfileDialog(
             text = "SWITCH NCERT CLASS (UPDATES ENTIRE CURRICULUM)",
             color = SilverMedium,
             fontSize = 10.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 0.8.sp
           )
           Spacer(modifier = Modifier.height(6.dp))
 
@@ -183,8 +215,8 @@ fun ProfileDialog(
                   .clip(RoundedCornerShape(8.dp))
                   .background(if (isSelected) Color.White.copy(alpha = 0.18f) else Color.White.copy(alpha = 0.04f))
                   .border(1.dp, if (isSelected) PlatinumWhite else Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
-                .clickable { selectedClass = nClass }
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                  .clickable { selectedClass = nClass }
+                  .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
               ) {
@@ -204,7 +236,7 @@ fun ProfileDialog(
           Spacer(modifier = Modifier.height(14.dp))
 
           // Gemini API Key
-          Text(text = "CUSTOM GEMINI API KEY", color = SilverMedium, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+          Text(text = "CUSTOM GEMINI API KEY", color = SilverMedium, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp)
           Spacer(modifier = Modifier.height(6.dp))
           OutlinedTextField(
             value = apiKey,
@@ -232,6 +264,23 @@ fun ProfileDialog(
             },
             modifier = Modifier.fillMaxWidth()
           )
+
+          Spacer(modifier = Modifier.height(10.dp))
+
+          // Sign Out / Switch Account
+          OutlinedButton(
+            onClick = onSignOut,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+              contentColor = UrgentRose
+            ),
+            border = androidx.compose.foundation.BorderStroke(1.dp, UrgentRose.copy(alpha = 0.35f)),
+            shape = RoundedCornerShape(12.dp)
+          ) {
+            Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, modifier = Modifier.size(16.dp), tint = UrgentRose)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Switch Academic Account / Sign Out", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+          }
         } else {
           // Achievements Tab
           Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -245,7 +294,20 @@ fun ProfileDialog(
                   .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
               ) {
-                Text(text = ach.iconEmoji, fontSize = 24.sp)
+                Box(
+                  modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(if (ach.isUnlocked) PlatinumWhite.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.04f)),
+                  contentAlignment = Alignment.Center
+                ) {
+                  Icon(
+                    imageVector = ach.icon,
+                    contentDescription = null,
+                    tint = if (ach.isUnlocked) PlatinumWhite else SilverMuted,
+                    modifier = Modifier.size(18.dp)
+                  )
+                }
                 Spacer(modifier = Modifier.width(10.dp))
                 Column(modifier = Modifier.weight(1f)) {
                   Text(

@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -56,7 +58,7 @@ fun ChapterDetailScreen(
           .clip(CircleShape)
           .background(Color.White.copy(alpha = 0.08f))
       ) {
-        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = PlatinumWhite)
+        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = PlatinumWhite)
       }
       Spacer(modifier = Modifier.width(12.dp))
       Column {
@@ -113,7 +115,7 @@ fun ChapterDetailScreen(
     if (chapter.formulas.isNotEmpty()) {
       GlassCard(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-          Text("⚡", fontSize = 16.sp)
+          Icon(Icons.Default.Functions, contentDescription = null, tint = PlatinumWhite, modifier = Modifier.size(16.dp))
           Spacer(modifier = Modifier.width(6.dp))
           Text(
             text = "KEY FORMULAS & GOVERNING LAWS",
@@ -245,7 +247,7 @@ fun ChapterDetailScreen(
             fontSize = 11.sp
           )
         }
-        Icon(Icons.Default.ArrowForwardIos, contentDescription = null, tint = SilverMedium, modifier = Modifier.size(14.dp))
+        Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null, tint = SilverMedium, modifier = Modifier.size(14.dp))
       }
     }
 
