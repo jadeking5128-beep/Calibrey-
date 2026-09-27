@@ -16,3 +16,6 @@
 local.properties
 .env
 debug.keystore
+
+# Explicitly track APK in release directory for GitHub distribution
+!release/*.apk
